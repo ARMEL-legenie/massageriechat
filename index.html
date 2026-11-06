@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0b0d1c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<title>CryptoChat</title>
+<style>
+:root{--a:#7c5cff;--b:#22d3ee;--tx:#eef0ff;--mu:#9aa3c7;--bd:rgba(255,255,255,.12);--gl:rgba(255,255,255,.06);--er:#ff7b8a;--ok:#4ade80}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(900px 500px at 10% -10%,rgba(124,92,255,.35),transparent),radial-gradient(800px 500px at 100% 0,rgba(34,211,238,.22),transparent),#0b0d1c;background-attachment:fixed}
+.hide{display:none!important}
+.wrap{max-width:520px;margin:0 auto;padding:calc(20px + env(safe-area-inset-top)) 16px 40px}
+.logo{text-align:center;margin:14px 0 18px}
+.logo b{font-size:2rem;background:linear-gradient(90deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
+.logo p{margin:4px 0 0;color:var(--mu);font-size:.92rem}
+.card{background:var(--gl);border:1px solid var(--bd);border-radius:20px;padding:18px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 10px 40px rgba(0,0,0,.35);margin-bottom:14px}
+.tabs{display:flex;gap:6px;background:rgba(0,0,0,.25);padding:4px;border-radius:14px;margin-bottom:14px}
+.tabs button{flex:1;background:transparent;color:var(--mu);padding:10px;border-radius:10px;font-weight:600}
+.tabs button.on{background:linear-gradient(90deg,var(--a),var(--b));color:#0b0d1c}
+label{display:block;font-size:.8rem;color:var(--mu);margin:12px 0 4px}
+input[type=text],input[type=email],input[type=tel],input[type=password],textarea{width:100%;padding:12px;border-radius:12px;border:1px solid var(--bd);background:rgba(0,0,0,.28);color:var(--tx);font:inherit;outline:none}
+input:focus,textarea:focus{border-color:var(--b)}
+button{font:inherit;border:0;border-radius:12px;padding:12px 16px;cursor:pointer;color:#0b0d1c;font-weight:700;background:linear-gradient(90deg,var(--a),var(--b))}
+button.g{background:var(--gl);color:var(--tx);border:1px solid var(--bd);font-weight:600}
+button.w{width:100%;margin-top:16px}
+button.dg{background:linear-gradient(90deg,#ff5d73,#ff8f6b);color:#fff}
+button.lk{display:block;text-align:center;margin-top:12px;color:var(--mu);font-size:.85rem;background:none;border:0;font-weight:500;width:100%}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.row>*{flex:1;min-width:110px}
+.chk{display:flex;gap:10px;margin-top:14px;font-size:.8rem;color:var(--mu)}.chk input{margin-top:3px;accent-color:var(--a)}
+.msg{min-height:1.3em;margin-top:10px;font-size:.9rem}.msg.e{color:var(--er)}.msg.o{color:var(--ok)}
+.s{color:var(--mu);font-size:.88rem;margin:0}
+h3{margin:16px 0 6px;font-size:1rem;color:var(--b)}
+hr{border:0;border-top:1px solid var(--bd);margin:18px 0}
+code{background:rgba(0,0,0,.35);padding:1px 6px;border-radius:6px}
+/* app */
+#app{display:grid;grid-template-columns:340px 1fr;height:100dvh;padding-top:env(safe-area-inset-top)}
+#side{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--bd);background:rgba(0,0,0,.18)}
+.hd{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--bd)}
+.hd b{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ib{padding:8px 11px;border-radius:12px;background:var(--gl);border:1px solid var(--bd);color:var(--tx);font-weight:600}
+#list{overflow-y:auto;flex:1}
+.ci{display:flex;gap:12px;align-items:center;padding:12px;border-bottom:1px solid var(--bd);cursor:pointer}
+.ci:hover{background:var(--gl)}
+.av{width:44px;height:44px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:800;color:#0b0d1c;background:linear-gradient(135deg,var(--a),var(--b))}
+.t{flex:1;min-width:0}.t b,.t small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+small{color:var(--mu)}
+.dot{width:11px;height:11px;border-radius:50%;background:var(--b);flex:none}
+#chat{display:flex;flex-direction:column;min-height:0;min-width:0}
+#msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column}
+.b{max-width:80%;padding:8px 12px;margin:3px 0;border-radius:16px;white-space:pre-wrap;word-break:break-word}
+.me{align-self:flex-end;background:linear-gradient(135deg,#6d4dff,#3b82f6);border-bottom-right-radius:4px}
+.them{align-self:flex-start;background:rgba(255,255,255,.1);border-bottom-left-radius:4px}
+.b.lo{cursor:pointer;font-style:italic;opacity:.9}
+.tm{display:block;text-align:right;font-size:.68rem;opacity:.65;margin-top:2px;font-style:normal}
+.dsep{align-self:center;font-size:.75rem;color:var(--mu);margin:10px 0 4px}
+.cm{display:flex;gap:8px;align-items:flex-end;padding:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--bd)}
+.cm textarea{height:46px;min-height:46px;max-height:120px;resize:none}
+.cm button{padding:12px 14px;flex:none}
+#empty{display:grid;place-items:center;text-align:center;color:var(--mu);padding:20px}
+.bk{display:none}
+#app:not(.inchat) #chat{display:none}
+#app.inchat #empty{display:none}
+@media(max-width:799px){#app{grid-template-columns:1fr}#app:not(.inchat) #empty{display:none}#app.inchat #side{display:none}.bk{display:inline-block}}
+/* modales */
+.md{position:fixed;inset:0;z-index:90;background:rgba(5,6,16,.72);display:flex;align-items:flex-end;justify-content:center}
+.md>.card{width:min(560px,100%);max-height:90dvh;overflow:auto;margin:0;border-radius:20px 20px 0 0;background:#151831}
+@media(min-width:600px){.md{align-items:center}.md>.card{border-radius:20px}}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.8rem}th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--bd);white-space:nowrap}th{color:var(--b)}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#232748;border:1px solid var(--bd);padding:10px 16px;border-radius:12px;z-index:120;font-size:.9rem}
+/* chargement */
+#ld{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:rgba(5,6,16,.72);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+.ldb{background:#171a33;border:1px solid var(--bd);border-radius:20px;padding:26px 30px;text-align:center;width:min(86vw,320px)}
+.sp{width:44px;height:44px;margin:0 auto 14px;border-radius:50%;border:4px solid rgba(255,255,255,.14);border-top-color:var(--b);animation:rot .8s linear infinite}
+.bar{height:5px;background:rgba(255,255,255,.1);border-radius:5px;overflow:hidden;margin-top:16px}
+.bar i{display:block;height:100%;width:40%;border-radius:5px;background:linear-gradient(90deg,var(--a),var(--b));animation:mv 1.2s ease-in-out infinite}
+@keyframes rot{to{transform:rotate(360deg)}}@keyframes mv{0%{margin-left:-40%}100%{margin-left:100%}}
+</style>
+</head>
+<body>
+
+<div id="cfg" class="wrap hide"><div class="card"><h3 style="margin-top:0">Application non configurée</h3><p class="s">Colle la configuration Firebase dans <code>index.html</code> (voir le guide), puis recharge la page.</p></div></div>
+
+<!-- ============ CONNEXION ============ -->
+<section id="auth" class="wrap hide">
+  <div class="logo"><b>🔐 CryptoChat</b><p>Discute en messages chiffrés</p></div>
+  <div class="card">
+    <div class="tabs"><button id="tl" class="on">Connexion</button><button id="tr">Créer un compte</button></div>
+    <form id="fl" onsubmit="return false">
+      <label for="le">E-mail</label><input id="le" type="email" autocomplete="username">
+      <label for="lp">Mot de passe</label><input id="lp" type="password" autocomplete="current-password">
+      <button class="w" id="bl" type="button">Se connecter</button>
+      <button class="lk" id="fo" type="button">Mot de passe oublié ?</button>
+    </form>
+    <form id="fr" class="hide" onsubmit="return false">
+      <label for="rn">Nom</label><input id="rn" type="text" autocomplete="family-name">
+      <label for="rp">Prénom</label><input id="rp" type="text" autocomplete="given-name">
+      <label for="re">E-mail</label><input id="re" type="email" autocomplete="email">
+      <label for="rt">Téléphone</label><input id="rt" type="tel" autocomplete="tel">
+      <label for="rw">Mot de passe (8 caractères minimum)</label><input id="rw" type="password" autocomplete="new-password">
+      <div class="chk"><input id="rc" type="checkbox"><label for="rc" style="margin:0">J’accepte que mon nom, prénom, e-mail et téléphone soient enregistrés et consultables par l’administrateur du service. Mon mot de passe lui reste inaccessible.</label></div>
+      <button class="w" id="br" type="button">Créer mon compte</button>
+    </form>
+    <form id="ff" class="hide" onsubmit="return false">
+      <p class="s">Saisis ton e-mail : tu recevras un lien pour choisir un nouveau mot de passe.</p>
+      <label for="fe">E-mail</label><input id="fe" type="email" autocomplete="email">
+      <button class="w" id="fb" type="button">Envoyer le lien</button>
+      <button class="lk" id="fx" type="button">← Retour à la connexion</button>
+    </form>
+    <div class="msg" id="am"></div>
+  </div>
+</section>
+
+<!-- ============ VÉRIFICATION E-MAIL ============ -->
+<section id="verify" class="wrap hide">
+  <div class="logo"><b>📧 Vérifie ton e-mail</b></div>
+  <div class="card">
+    <p class="s">Un lien de confirmation a été envoyé à <b id="vem"></b>. Clique dessus (regarde aussi les courriers indésirables), puis reviens ici.</p>
+    <button class="w" id="vk" type="button">J’ai confirmé mon e-mail</button>
+    <div class="row"><button class="g" id="vr" type="button">Renvoyer l’e-mail</button><button class="g" id="vo" type="button">Déconnexion</button></div>
+    <div class="msg" id="vm"></div>
+  </div>
+</section>
+
+<!-- ============ APPLICATION ============ -->
+<div id="app" class="hide">
+  <aside id="side">
+    <div class="hd"><div class="av" id="mav">?</div><b id="mnm"></b>
+      <button class="ib hide" id="inst" title="Installer">📲</button>
+      <button class="ib hide" id="adb" title="Administrateur">🛠</button>
+      <button class="ib" id="nb" title="Nouvelle discussion">➕</button>
+      <button class="ib" id="ab" title="Mon compte">⚙️</button></div>
+    <div id="list"></div>
+    <p class="s hide" id="lempty" style="padding:24px;text-align:center">Aucune discussion.<br>Appuie sur ➕ pour écrire à quelqu’un avec son e-mail.</p>
+  </aside>
+  <section id="chat">
+    <div class="hd"><button class="ib bk" id="bk">←</button><div class="av" id="ca">?</div><b id="ct"></b><button class="ib" id="kb" title="Clé de la conversation">🔑</button></div>
+    <div id="msgs"></div>
+    <div class="cm"><textarea id="mt" placeholder="Écris ton message… (chiffré automatiquement)" rows="1"></textarea><button id="sd" title="Envoyer">🔒 Envoyer</button></div>
+  </section>
+  <section id="empty"><div><div style="font-size:3rem">🔐</div><p>Choisis une discussion<br>ou démarre-en une avec ➕</p></div></section>
+</div>
+
+<!-- ============ MODALES ============ -->
+<div id="mk" class="md hide"><div class="card">
+  <h3 style="margin-top:0">🔑 Clé de la conversation</h3>
+  <p class="s">Convenez de cette clé avec ton contact <b>en dehors de l’application</b> (en personne, par appel). Elle n’est jamais envoyée au serveur.</p>
+  <label for="kk">Clé secrète</label><input id="kk" type="password" autocomplete="off">
+  <div class="chk"><input id="kr" type="checkbox"><label for="kr" style="margin:0">Retenir la clé sur cet appareil (pratique, mais quiconque utilise ce téléphone pourra lire cette conversation).</label></div>
+  <button class="w" id="kv" type="button">Valider</button>
+  <div class="row"><button class="g" id="kg" type="button">🎲 Générer</button><button class="g" id="ks" type="button">📤 Partager la clé</button></div>
+  <div class="row"><button class="g" id="kf" type="button">Oublier la clé</button><button class="g" id="kx" type="button">Fermer</button></div>
+  <div class="msg" id="km"></div>
+</div></div>
+
+<div id="mn" class="md hide"><div class="card">
+  <h3 style="margin-top:0">➕ Nouvelle discussion</h3>
+  <label for="ne">E-mail de ton contact</label><input id="ne" type="email" autocomplete="off">
+  <button class="w" id="nv" type="button">Ouvrir la discussion</button>
+  <div class="row"><button class="g hide" id="ni" type="button">📤 Inviter cette personne</button><button class="g" id="nx" type="button">Fermer</button></div>
+  <div class="msg" id="nm"></div>
+</div></div>
+
+<div id="ma" class="md hide"><div class="card">
+  <h3 style="margin-top:0">⚙️ Mon compte</h3>
+  <p class="s" id="mi"></p>
+  <div class="row"><button class="g" id="nt" type="button">🔔 Activer les alertes</button><button class="g" id="fk" type="button">Oublier toutes mes clés</button></div>
+  <hr>
+  <h3 style="margin-top:0">Changer mon mot de passe</h3>
+  <label for="op">Mot de passe actuel</label><input id="op" type="password" autocomplete="current-password">
+  <label for="np">Nouveau mot de passe (8 caractères minimum)</label><input id="np" type="password" autocomplete="new-password">
+  <label for="np2">Confirmer</label><input id="np2" type="password" autocomplete="new-password">
+  <button class="w" id="pb" type="button">Mettre à jour</button>
+  <div class="msg" id="pwm"></div>
+  <hr>
+  <h3 style="margin-top:0">Comment ça marche</h3>
+  <p class="s">1. Ouvre une discussion avec ➕.<br>2. Convenez d’une <b>clé secrète</b> en dehors de l’application, puis saisis-la via 🔑 (🎲 en génère une solide).<br>3. Écris : le message est chiffré avant l’envoi. Sans la clé, on ne voit qu’un message verrouillé 🔒.<br>4. Case « Retenir la clé » : tes messages s’affichent directement, sans ressaisie.<br>5. Installation : bouton 📲, ou « Sur l’écran d’accueil » sur iPhone.</p>
+  <hr>
+  <h3 style="margin-top:0;color:var(--er)">Supprimer mon compte</h3>
+  <label for="dp">Mot de passe</label><input id="dp" type="password" autocomplete="current-password">
+  <button class="w dg" id="db" type="button">Supprimer définitivement mon compte</button>
+  <div class="msg" id="dlm"></div>
+  <div class="row"><button class="g" id="lo" type="button">Déconnexion</button><button class="g" id="mx" type="button">Fermer</button></div>
+</div></div>
+
+<div id="ad" class="md hide"><div class="card">
+  <h3 style="margin-top:0">🛠 Espace administrateur</h3>
+  <h3>Activité</h3><div class="tw"><table id="t_s"></table></div><p class="s" id="rst" style="margin-top:8px"></p>
+  <h3>Nouveaux inscrits (7 jours)</h3><div class="tw"><table id="t_n"></table></div>
+  <h3>Comptes supprimés (7 jours)</h3><div class="tw"><table id="t_x"></table></div>
+  <h3>Tous les comptes (<span id="c1">0</span>)</h3><div class="tw"><table id="t_m"></table></div>
+  <h3>Dernières connexions</h3><div class="tw"><table id="t_l"></table></div>
+  <div class="row"><button class="g" id="ar" type="button">Actualiser</button><button class="g" id="adx" type="button">Fermer</button></div>
+  <div class="msg" id="ax"></div>
+</div></div>
+
+<div id="toast" class="hide"></div>
+<div id="ld" role="status" aria-live="polite"><div class="ldb"><div class="sp"></div><b id="ldt">Chargement…</b><div class="bar"><i></i></div></div></div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {getAuth,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,sendEmailVerification,sendPasswordResetEmail,updatePassword,reauthenticateWithCredential,EmailAuthProvider,deleteUser} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {getFirestore,doc,getDoc,setDoc,collection,addDoc,query,where,orderBy,limitToLast,onSnapshot,serverTimestamp,deleteDoc,getDocs,writeBatch} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+/* ============ CONFIGURATION (à remplir, voir le guide) ============ */
+const FIREBASE_CONFIG={apiKey:"AIzaSyDK646qSDrrLQOfPi5vn3f7vv1ZNCc_57Q",authDomain:"cryptochat-5bff6.firebaseapp.com",projectId:"cryptochat-5bff6",storageBucket:"cryptochat-5bff6.firebasestorage.app",messagingSenderId:"629421134109",appId:"1:629421134109:web:839edccbb657b8d565d1f4"};
+const ADMIN_UID="";   /* ton identifiant utilisateur Firebase (guide, étape 8) */
+const NOTIFY_URL="";  /* optionnel : URL du script d’e-mails (notification.gs) */
+/* ================================================================== */
+
+const $=i=>document.getElementById(i),show=(i,v)=>$(i).classList.toggle("hide",!v);
+const say=(id,m,c)=>{const e=$(id);e.textContent=m;e.className="msg "+(c||"")};
+const te=new TextEncoder(),td=new TextDecoder();
+function toast(m){const t=$("toast");t.textContent=m;t.classList.remove("hide");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.add("hide"),2800)}
+
+/* ---- indicateur de chargement ---- */
+let ldT=null,ldS=null;
+function busy(msg){clearTimeout(ldT);clearTimeout(ldS);
+  ldT=setTimeout(()=>{$("ldt").textContent=msg;show("ld",true);ldS=setTimeout(()=>{$("ldt").textContent="Encore un instant…"},4000)},150);
+  return()=>{clearTimeout(ldT);clearTimeout(ldS);show("ld",false)}}
+async function run(label,fn){const done=busy(label);try{return await fn()}finally{done()}}
+
+if(!FIREBASE_CONFIG.apiKey){show("ld",false);show("cfg",true);throw new Error("Firebase non configuré")}
+
+const app=initializeApp(FIREBASE_CONFIG),auth=getAuth(app),db=getFirestore(app);
+let me=null,prof=null,convs=new Map(),profs=new Map(),cur=null,unsubC=null,unsubM=null,msgs=[],tok=0,stick=false;
+
+/* ---- crypto (AES-256-GCM, clé dérivée de la clé secrète de la conversation) ---- */
+const b64=u=>{let s="";u.forEach(x=>s+=String.fromCharCode(x));return btoa(s)};
+const unb64=t=>Uint8Array.from(atob(t),c=>c.charCodeAt(0));
+const keyCache=new Map(),memKeys=new Map();
+const lsk=cid=>"cck_"+me.uid+"_"+cid;
+const getPass=cid=>memKeys.get(cid)||localStorage.getItem(lsk(cid))||"";
+async function derive(cid,pass){
+  const salt=new Uint8Array(await crypto.subtle.digest("SHA-256",te.encode("cryptochat:conv:"+cid)));
+  const km=await crypto.subtle.importKey("raw",te.encode(pass),"PBKDF2",false,["deriveKey"]);
+  return crypto.subtle.deriveKey({name:"PBKDF2",salt,iterations:250000,hash:"SHA-256"},km,{name:"AES-GCM",length:256},false,["encrypt","decrypt"]);
+}
+async function ckey(cid,pass){
+  pass=pass||getPass(cid);if(!pass)return null;
+  const c=keyCache.get(cid);if(c&&c.p===pass)return c.k;
+  const k=await derive(cid,pass);keyCache.set(cid,{p:pass,k});return k;
+}
+async function enc(cid,text){
+  const k=await ckey(cid),iv=crypto.getRandomValues(new Uint8Array(12));
+  const ct=new Uint8Array(await crypto.subtle.encrypt({name:"AES-GCM",iv},k,te.encode(text)));
+  const all=new Uint8Array(12+ct.length);all.set(iv);all.set(ct,12);return "CC2."+b64(all);
+}
+async function dec(k,ct){const a=unb64(ct.replace(/^CC2\./,""));return td.decode(await crypto.subtle.decrypt({name:"AES-GCM",iv:a.slice(0,12)},k,a.slice(12)))}
+
+/* ---- utilitaires ---- */
+function aerr(e){const c=(e&&e.code)||"";
+  if(/invalid-credential|wrong-password|user-not-found|invalid-login/.test(c))return "E-mail ou mot de passe incorrect.";
+  if(c.includes("email-already"))return "Un compte existe déjà avec cet e-mail.";
+  if(c.includes("too-many"))return "Trop d’essais. Réessaie dans quelques minutes.";
+  if(c.includes("network"))return "Connexion impossible. Vérifie ton réseau.";
+  if(c.includes("weak-password"))return "Mot de passe trop faible (8 caractères minimum).";
+  if(c.includes("requires-recent"))return "Reconnecte-toi puis réessaie.";
+  if(c.includes("permission"))return "Action refusée par le serveur (vérifie les règles Firestore).";
+  return "Une erreur est survenue, réessaie."}
+function notify(p){if(!NOTIFY_URL)return;try{fetch(NOTIFY_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(p)}).catch(()=>{})}catch(e){}}
+const ini=n=>((n||"?").trim()[0]||"?").toUpperCase();
+const hhmm=ms=>new Date(ms).toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
+const dayOf=ms=>new Date(ms).toDateString();
+const dayLbl=ms=>dayOf(ms)===new Date().toDateString()?"Aujourd’hui":new Date(ms).toLocaleDateString("fr-FR",{day:"numeric",month:"long"});
+const copy=t=>(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject());
+
+/* ============ AUTHENTIFICATION ============ */
+const tabs=(a,b)=>{$("tl").classList.toggle("on",a==="fl");$("tr").classList.toggle("on",a==="fr");["fl","fr","ff"].forEach(x=>show(x,x===a));say("am","")};
+$("tl").onclick=()=>tabs("fl");$("tr").onclick=()=>tabs("fr");
+$("fo").onclick=()=>{tabs("ff");$("fe").value=$("le").value};
+$("fx").onclick=()=>tabs("fl");
+
+$("br").onclick=()=>{
+  const nom=$("rn").value.trim(),prenom=$("rp").value.trim(),email=$("re").value.trim().toLowerCase(),tel=$("rt").value.trim(),pw=$("rw").value;
+  if(!nom||!prenom||!/^[^\s\/@]+@[^\s\/@]+\.[^\s\/@]+$/.test(email)||tel.length<6)return say("am","Remplis correctement tous les champs.","e");
+  if(pw.length<8)return say("am","Mot de passe : 8 caractères minimum.","e");
+  if(!$("rc").checked)return say("am","Le consentement est obligatoire.","e");
+  return run("Création de ton compte…",async()=>{
+    try{
+      const cr=await createUserWithEmailAndPassword(auth,email,pw),uid=cr.user.uid;
+      await setDoc(doc(db,"profiles",uid),{nom,prenom,email});
+      await setDoc(doc(db,"users",uid),{nom,prenom,email,telephone:tel,createdAt:serverTimestamp()});
+      await sendEmailVerification(cr.user);
+      notify({type:"register",nom,prenom,email,telephone:tel});
+    }catch(e){say("am",aerr(e),"e")}
+  });
+};
+$("bl").onclick=()=>{
+  const e=$("le").value.trim().toLowerCase(),pw=$("lp").value;
+  if(!e||!pw)return say("am","Saisis ton e-mail et ton mot de passe.","e");
+  return run("Connexion en cours…",async()=>{
+    try{const c=await signInWithEmailAndPassword(auth,e,pw);$("lp").value="";addDoc(collection(db,"logins"),{uid:c.user.uid,at:serverTimestamp()}).catch(()=>{})}
+    catch(x){say("am",aerr(x),"e")}
+  });
+};
+$("fb").onclick=()=>{
+  const e=$("fe").value.trim().toLowerCase();
+  if(!/^\S+@\S+\.\S+$/.test(e))return say("am","Saisis un e-mail valide.","e");
+  return run("Envoi du lien…",async()=>{
+    try{await sendPasswordResetEmail(auth,e)}catch(x){if(/network|too-many/.test(x.code||""))return say("am",aerr(x),"e")}
+    say("am","Si un compte existe avec cet e-mail, un lien vient d’être envoyé. Pense aux courriers indésirables.","o");
+  });
+};
+
+/* vérification e-mail */
+$("vk").onclick=()=>run("Vérification…",async()=>{
+  try{await me.reload();await me.getIdToken(true)}catch(e){return say("vm",aerr(e),"e")}
+  if(auth.currentUser.emailVerified){show("verify",false);await startApp()}
+  else say("vm","Pas encore confirmé. Clique sur le lien reçu par e-mail.","e");
+});
+$("vr").onclick=()=>run("Envoi…",async()=>{try{await sendEmailVerification(me);say("vm","E-mail renvoyé ✔","o")}catch(e){say("vm",aerr(e),"e")}});
+$("vo").onclick=()=>signOut(auth);
+
+onAuthStateChanged(auth,async u=>{
+  cleanup();me=u;show("ld",false);
+  if(!u){show("app",false);show("verify",false);show("auth",true);return}
+  show("auth",false);
+  if(!u.emailVerified){show("app",false);$("vem").textContent=u.email;show("verify",true);return}
+  show("verify",false);
+  try{await startApp()}catch(e){console.error(e);toast(aerr(e))}
+});
+function cleanup(){
+  if(unsubC)unsubC();if(unsubM)unsubM();unsubC=unsubM=null;
+  convs=new Map();cur=null;msgs=[];memKeys.clear();keyCache.clear();
+  $("app").classList.remove("inchat");$("list").textContent="";$("msgs").textContent="";document.title="CryptoChat";
+}
+
+/* ============ DÉMARRAGE ============ */
+async function startApp(){
+  const uid=me.uid,email=me.email.toLowerCase();
+  let p=await getDoc(doc(db,"profiles",uid));
+  if(!p.exists()){await setDoc(doc(db,"profiles",uid),{nom:email.split("@")[0],prenom:"",email});p=await getDoc(doc(db,"profiles",uid))}
+  prof=p.data();
+  const dr=doc(db,"directory",email);
+  if(!(await getDoc(dr)).exists())await setDoc(dr,{uid});
+  const nm=(prof.prenom+" "+prof.nom).trim();
+  $("mnm").textContent=nm;$("mav").textContent=ini(nm);$("mi").textContent=nm+" · "+email;
+  show("adb",!!ADMIN_UID&&uid===ADMIN_UID);
+  show("app",true);
+  subscribeConvs();
+}
+
+/* ============ CONVERSATIONS ============ */
+async function otherProfile(uid){
+  if(profs.has(uid))return profs.get(uid);
+  let v={name:"Compte supprimé",email:""};
+  try{const d=await getDoc(doc(db,"profiles",uid));if(d.exists()){const x=d.data();v={name:(x.prenom+" "+x.nom).trim(),email:x.email}}}catch(e){}
+  profs.set(uid,v);return v;
+}
+const readKey=cid=>"ccr_"+me.uid+"_"+cid;
+function unread(c){return !!c.lastFrom&&c.lastFrom!==me.uid&&c.lastAt>Number(localStorage.getItem(readKey(c.id))||0)}
+function markRead(cid){const c=convs.get(cid);if(c)localStorage.setItem(readKey(cid),String(c.lastAt))}
+function subscribeConvs(){
+  const q=query(collection(db,"conversations"),where("members","array-contains",me.uid));
+  let first=true;
+  unsubC=onSnapshot(q,async snap=>{
+    const list=[];
+    for(const d of snap.docs){
+      const x=d.data({serverTimestamps:"estimate"}),oid=x.members.find(m=>m!==me.uid)||me.uid,op=await otherProfile(oid);
+      list.push({id:d.id,other:oid,name:op.name,email:op.email,lastAt:x.lastAt?x.lastAt.toMillis():Date.now(),lastFrom:x.lastFrom||""});
+    }
+    if(!first&&document.hidden&&snap.docChanges().some(ch=>ch.type!=="removed"&&!ch.doc.metadata.hasPendingWrites&&(ch.doc.data().lastFrom||"")!==me.uid))alertNew();
+    first=false;
+    convs=new Map(list.map(c=>[c.id,c]));
+    if(cur&&convs.has(cur))markRead(cur);
+    renderList();
+  },e=>console.error(e));
+}
+function renderList(){
+  const box=$("list");box.textContent="";
+  const arr=[...convs.values()].sort((a,b)=>b.lastAt-a.lastAt);
+  show("lempty",arr.length===0);
+  let n=0;
+  for(const c of arr){
+    const u=unread(c);if(u)n++;
+    const it=document.createElement("div");it.className="ci";
+    const av=document.createElement("div");av.className="av";av.textContent=ini(c.name);
+    const t=document.createElement("div");t.className="t";
+    const b=document.createElement("b");b.textContent=c.name;
+    const s=document.createElement("small");
+    s.textContent=c.lastFrom?"🔒 Message chiffré · "+(dayOf(c.lastAt)===new Date().toDateString()?hhmm(c.lastAt):dayLbl(c.lastAt)):"Nouvelle discussion";
+    t.append(b,s);it.append(av,t);
+    if(u){const d=document.createElement("div");d.className="dot";it.append(d)}
+    it.onclick=()=>openChat(c.id);box.append(it);
+  }
+  document.title=(n?"("+n+") ":"")+"CryptoChat";
+}
+function alertNew(){
+  try{if("Notification" in window&&Notification.permission==="granted")new Notification("CryptoChat",{body:"🔒 Nouveau message chiffré",icon:"icon-192.png"})}catch(e){}
+}
+
+/* ============ DISCUSSION ============ */
+function openChat(cid){
+  const c=convs.get(cid);if(!c)return;
+  if(unsubM)unsubM();cur=cid;msgs=[];stick=true;
+  $("ct").textContent=c.name;$("ca").textContent=ini(c.name);$("msgs").textContent="";
+  $("app").classList.add("inchat");markRead(cid);renderList();
+  const q=query(collection(db,"conversations",cid,"messages"),orderBy("at"),limitToLast(150));
+  unsubM=onSnapshot(q,snap=>{
+    msgs=snap.docs.map(d=>{const x=d.data({serverTimestamps:"estimate"});return{id:d.id,from:x.from,ct:x.ct,at:x.at?x.at.toMillis():Date.now()}});
+    markRead(cid);renderMsgs();
+  },e=>{console.error(e);toast("Lecture impossible")});
+  if(!getPass(cid)&&!localStorage.getItem("cc_tip"))toast("Appuie sur 🔑 pour saisir la clé de la conversation");
+}
+$("bk").onclick=()=>{if(unsubM)unsubM();unsubM=null;cur=null;$("app").classList.remove("inchat");renderList()};
+async function renderMsgs(){
+  const t=++tok,cid=cur;if(!cid)return;
+  const box=$("msgs"),near=box.scrollHeight-box.scrollTop-box.clientHeight<140;
+  let k=null;try{k=await ckey(cid)}catch(e){}
+  const out=[];
+  for(const m of msgs){let x=null;if(k){try{x=await dec(k,m.ct)}catch(e){x=false}}out.push([m,x])}
+  if(t!==tok||cid!==cur)return;
+  box.textContent="";let last="";
+  for(const [m,x] of out){
+    if(dayOf(m.at)!==last){last=dayOf(m.at);const s=document.createElement("div");s.className="dsep";s.textContent=dayLbl(m.at);box.append(s)}
+    const b=document.createElement("div");b.className="b "+(m.from===me.uid?"me":"them");
+    if(typeof x==="string")b.textContent=x;
+    else{b.classList.add("lo");b.textContent=x===false?"⚠️ Illisible avec cette clé":"🔒 Message chiffré — touche pour déchiffrer";b.onclick=openKey}
+    const tm=document.createElement("span");tm.className="tm";tm.textContent=hhmm(m.at);b.append(tm);box.append(b);
+  }
+  if(near||stick){box.scrollTop=box.scrollHeight;stick=false}
+}
+async function send(){
+  const text=$("mt").value.trim();if(!text||!cur)return;
+  if(!getPass(cur)){openKey();say("km","Saisis la clé de cette conversation pour envoyer.");return}
+  const cid=cur;
+  try{
+    const ct=await enc(cid,text);$("mt").value="";size();
+    const b=writeBatch(db);
+    b.set(doc(collection(db,"conversations",cid,"messages")),{from:me.uid,ct,at:serverTimestamp()});
+    b.update(doc(db,"conversations",cid),{lastAt:serverTimestamp(),lastFrom:me.uid});
+    await b.commit();
+  }catch(e){console.error(e);if(!$("mt").value)$("mt").value=text;toast("Envoi impossible")}
+}
+const size=()=>{const t=$("mt");t.style.height="46px";t.style.height=Math.min(120,t.scrollHeight)+"px"};
+$("mt").oninput=size;$("sd").onclick=send;
+$("mt").onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey&&matchMedia("(hover:hover)").matches){e.preventDefault();send()}};
+
+/* ============ CLÉ DE LA CONVERSATION (option C) ============ */
+function openKey(){
+  if(!cur)return;
+  $("kk").type="password";$("kk").value=getPass(cur);$("kr").checked=!!localStorage.getItem(lsk(cur));say("km","");show("mk",true);
+}
+$("kb").onclick=openKey;$("kx").onclick=()=>show("mk",false);
+$("kg").onclick=()=>{
+  const ch="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789",r=crypto.getRandomValues(new Uint32Array(20));
+  let k="";for(let i=0;i<20;i++)k+=ch[r[i]%ch.length];
+  $("kk").type="text";$("kk").value=k;say("km","Clé générée : partage-la avec ton contact, puis valide.","o");
+};
+$("ks").onclick=()=>{
+  const k=$("kk").value;if(!k)return say("km","Aucune clé à partager.","e");
+  say("km","⚠️ Envoie la clé par un autre canal que cette application (appel, en personne).");
+  if(navigator.share)navigator.share({text:k}).catch(()=>{});else copy(k).then(()=>say("km","Clé copiée ✔ — envoie-la hors de l’application.","o"),()=>{});
+};
+$("kv").onclick=()=>run("Vérification de la clé…",async()=>{
+  const pass=$("kk").value.trim(),cid=cur;
+  if(pass.length<6)return say("km","Clé trop courte (6 caractères minimum).","e");
+  const k=await ckey(cid,pass);
+  const probe=msgs[msgs.length-1];
+  if(probe){try{await dec(k,probe.ct)}catch(e){return say("km","Clé incorrecte pour cette conversation.","e")}}
+  memKeys.set(cid,pass);
+  if($("kr").checked)localStorage.setItem(lsk(cid),pass);else localStorage.removeItem(lsk(cid));
+  show("mk",false);toast("Clé enregistrée ✔");renderMsgs();
+});
+$("kf").onclick=()=>{memKeys.delete(cur);localStorage.removeItem(lsk(cur));keyCache.delete(cur);$("kk").value="";show("mk",false);renderMsgs();toast("Clé oubliée")};
+
+/* ============ NOUVELLE DISCUSSION ============ */
+$("nb").onclick=()=>{$("ne").value="";say("nm","");show("ni",false);show("mn",true)};
+$("nx").onclick=()=>show("mn",false);
+$("ni").onclick=()=>{const t="Rejoins-moi sur CryptoChat, messagerie chiffrée : "+location.href.split("#")[0];if(navigator.share)navigator.share({text:t}).catch(()=>{});else copy(t).then(()=>say("nm","Invitation copiée ✔","o"),()=>{})};
+async function waitConv(cid){for(let i=0;i<25&&!convs.has(cid);i++)await new Promise(r=>setTimeout(r,150))}
+$("nv").onclick=()=>{
+  const email=$("ne").value.trim().toLowerCase();
+  if(!/^[^\s\/@]+@[^\s\/@]+\.[^\s\/@]+$/.test(email))return say("nm","Saisis un e-mail valide.","e");
+  if(email===me.email.toLowerCase())return say("nm","C’est ton propre e-mail.","e");
+  return run("Recherche…",async()=>{
+    try{
+      const d=await getDoc(doc(db,"directory",email));
+      if(!d.exists()){show("ni",true);return say("nm","Aucun compte confirmé avec cet e-mail. Invite cette personne !","e")}
+      const other=d.data().uid,ms=[me.uid,other].sort(),cid=ms.join("_");
+      if(!convs.has(cid)){
+        await setDoc(doc(db,"conversations",cid),{members:ms,lastAt:serverTimestamp(),lastFrom:"",createdAt:serverTimestamp()});
+        await waitConv(cid);
+      }
+      show("mn",false);openChat(cid);
+    }catch(e){console.error(e);say("nm",aerr(e),"e")}
+  });
+};
+
+/* ============ COMPTE ============ */
+$("ab").onclick=()=>{say("pwm","");say("dlm","");show("ma",true)};
+$("mx").onclick=()=>show("ma",false);
+$("lo").onclick=()=>{show("ma",false);signOut(auth)};
+$("fk").onclick=()=>{Object.keys(localStorage).filter(k=>k.startsWith("cck_"+me.uid+"_")).forEach(k=>localStorage.removeItem(k));memKeys.clear();keyCache.clear();renderMsgs();toast("Toutes les clés ont été oubliées")};
+$("nt").onclick=async()=>{
+  if(!("Notification" in window))return toast("Alertes non prises en charge ici");
+  const r=await Notification.requestPermission();toast(r==="granted"?"Alertes activées (application ouverte)":"Alertes refusées")
+};
+$("pb").onclick=()=>{
+  const np=$("np").value;
+  if(!$("op").value)return say("pwm","Saisis ton mot de passe actuel.","e");
+  if(np.length<8)return say("pwm","Nouveau mot de passe : 8 caractères minimum.","e");
+  if(np!==$("np2").value)return say("pwm","Les deux mots de passe ne correspondent pas.","e");
+  return run("Mise à jour du mot de passe…",async()=>{
+    try{await reauthenticateWithCredential(me,EmailAuthProvider.credential(me.email,$("op").value));await updatePassword(me,np);
+      $("op").value=$("np").value=$("np2").value="";say("pwm","Mot de passe mis à jour ✔","o")}
+    catch(e){say("pwm",aerr(e),"e")}
+  });
+};
+$("db").onclick=()=>{
+  if(!$("dp").value)return say("dlm","Saisis ton mot de passe.","e");
+  if(!confirm("Supprimer définitivement ton compte ? Cette action est irréversible."))return;
+  return run("Suppression du compte…",async()=>{
+    try{
+      const uid=me.uid,email=me.email.toLowerCase();
+      await reauthenticateWithCredential(me,EmailAuthProvider.credential(me.email,$("dp").value));
+      let u={};try{u=(await getDoc(doc(db,"users",uid))).data()||{}}catch(e){}
+      await addDoc(collection(db,"deletions"),{uid,nom:u.nom||prof.nom||"",prenom:u.prenom||prof.prenom||"",email,telephone:u.telephone||"",at:serverTimestamp()});
+      await deleteDoc(doc(db,"directory",email));await deleteDoc(doc(db,"profiles",uid));await deleteDoc(doc(db,"users",uid));
+      Object.keys(localStorage).filter(k=>k.includes("_"+uid+"_")).forEach(k=>localStorage.removeItem(k));
+      notify({type:"delete",nom:u.nom||"",prenom:u.prenom||"",email,telephone:u.telephone||""});
+      await deleteUser(me);$("dp").value="";show("ma",false);
+    }catch(e){say("dlm",aerr(e),"e")}
+  });
+};
+
+/* ============ ADMINISTRATEUR ============ */
+const fmt=v=>typeof v==="number"&&v>1e11?new Date(v).toLocaleString("fr-FR",{dateStyle:"short",timeStyle:"short"}):(v===0||v==null?"":String(v));
+function fill(id,head,rows,keep){
+  const t=$(id);t.textContent="";const tr=document.createElement("tr");
+  head.forEach(h=>{const th=document.createElement("th");th.textContent=h;tr.append(th)});t.append(tr);
+  (keep?rows:rows.slice().reverse()).forEach(r=>{const x=document.createElement("tr");r.slice(0,head.length).forEach(v=>{const c=document.createElement("td");c.textContent=fmt(v);x.append(c)});t.append(x)});
+}
+async function loadAdmin(){
+  const ms=t=>t&&t.toMillis?t.toMillis():0;
+  const [u,l,x]=await Promise.all([getDocs(collection(db,"users")),getDocs(collection(db,"logins")),getDocs(collection(db,"deletions"))]);
+  const users=u.docs.map(d=>({id:d.id,...d.data()})),by=new Map(users.map(a=>[a.id,a]));
+  const A={
+    members:users.map(a=>[ms(a.createdAt),a.nom,a.prenom,a.email,a.telephone]).sort((a,b)=>a[0]-b[0]),
+    logins:l.docs.map(d=>{const v=d.data(),p=by.get(v.uid)||{};return[ms(v.at),p.nom||"?",p.prenom||"",p.email||"",p.telephone||"",v.uid]}).sort((a,b)=>a[0]-b[0]),
+    deletions:x.docs.map(d=>{const v=d.data();return[ms(v.at),v.nom,v.prenom,v.email,v.telephone]}).sort((a,b)=>a[0]-b[0])
+  };
+  const now=Date.now(),P=[864e5,7*864e5,30*864e5],inP=(r,m)=>r[0]>0&&now-r[0]<=m;
+  const cnt=(a,m)=>a.filter(r=>inP(r,m)).length,uq=(a,m)=>new Set(a.filter(r=>inP(r,m)).map(r=>r[5]||r[3])).size;
+  fill("t_s",["","24 h","7 jours","30 jours"],[["Nouveaux comptes",...P.map(m=>cnt(A.members,m))],["Connexions",...P.map(m=>cnt(A.logins,m))],["Utilisateurs actifs",...P.map(m=>uq(A.logins,m))],["Comptes supprimés",...P.map(m=>cnt(A.deletions,m))]],true);
+  const last=A.logins[A.logins.length-1];
+  $("rst").textContent="Comptes actuels : "+A.members.length+(last?" · Dernière connexion : "+fmt(last[0])+" ("+last[2]+" "+last[1]+")":"");
+  const H=["Date","Nom","Prénom","E-mail","Téléphone"];
+  fill("t_n",H,A.members.filter(r=>inP(r,P[1])));fill("t_x",H,A.deletions.filter(r=>inP(r,P[1])));
+  fill("t_m",H,A.members);fill("t_l",H,A.logins.slice(-100));$("c1").textContent=A.members.length;
+}
+$("adb").onclick=()=>{show("ad",true);run("Chargement des données…",async()=>{try{say("ax","");await loadAdmin()}catch(e){say("ax",aerr(e),"e")}})};
+$("ar").onclick=()=>run("Actualisation…",async()=>{try{say("ax","");await loadAdmin()}catch(e){say("ax",aerr(e),"e")}});
+$("adx").onclick=()=>show("ad",false);
+
+/* ============ INSTALLATION (PWA) ============ */
+let dp=null;
+addEventListener("beforeinstallprompt",e=>{e.preventDefault();dp=e;show("inst",true)});
+addEventListener("appinstalled",()=>show("inst",false));
+$("inst").onclick=()=>{if(dp){dp.prompt();dp=null;show("inst",false)}};
+if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&cur){markRead(cur);renderList()}});
+</script>
+</body>
+</html>
