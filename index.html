@@ -74,6 +74,13 @@ small{color:var(--mu)}
 @media(min-width:600px){.md{align-items:center}.md>.card{border-radius:20px}}
 .tw{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.8rem}th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--bd);white-space:nowrap}th{color:var(--b)}
 #toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#232748;border:1px solid var(--bd);padding:10px 16px;border-radius:12px;z-index:120;font-size:.9rem}
+.q{border-left:3px solid var(--b);background:rgba(0,0,0,.25);border-radius:8px;padding:4px 8px;margin-bottom:5px;font-size:.82rem;cursor:pointer}
+.q b{display:block;color:var(--b);font-size:.74rem}
+.q span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.9}
+.fl{animation:fl 1.3s}@keyframes fl{0%,65%{box-shadow:0 0 0 3px var(--b)}100%{box-shadow:0 0 0 0 transparent}}
+#rb{display:flex;align-items:center;gap:10px;padding:8px 12px;border-top:1px solid var(--bd);background:rgba(0,0,0,.22)}
+#rb>div{flex:1;min-width:0;border-left:3px solid var(--b);padding-left:8px}
+#rb small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* chargement */
 #ld{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:rgba(5,6,16,.72);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
 .ldb{background:#171a33;border:1px solid var(--bd);border-radius:20px;padding:26px 30px;text-align:center;width:min(86vw,320px)}
@@ -142,6 +149,7 @@ small{color:var(--mu)}
   <section id="chat">
     <div class="hd"><button class="ib bk" id="bk">←</button><div class="av" id="ca">?</div><b id="ct"></b><button class="ib" id="kb" title="Clé de la conversation">🔑</button></div>
     <div id="msgs"></div>
+    <div id="rb" class="hide"><div><b id="rbn" style="display:block;color:var(--b);font-size:.78rem"></b><small id="rbt"></small></div><button class="ib" id="rbx" type="button">✕</button></div>
     <div class="cm"><textarea id="mt" placeholder="Écris ton message… (chiffré automatiquement)" rows="1"></textarea><button id="sd" title="Envoyer">🔒 Envoyer</button></div>
   </section>
   <section id="empty"><div><div style="font-size:3rem">🔐</div><p>Choisis une discussion<br>ou démarre-en une avec ➕</p></div></section>
@@ -159,6 +167,11 @@ small{color:var(--mu)}
   <div class="msg" id="km"></div>
 </div></div>
 
+<div id="mm" class="md hide"><div class="card">
+  <div class="row" style="margin-top:0"><button id="mr" type="button">↩️ Répondre</button><button class="g" id="mc" type="button">📋 Copier</button><button class="g dg" id="md" type="button">🗑️ Supprimer pour tous</button></div>
+  <button class="lk" id="mq" type="button">Fermer</button>
+</div></div>
+
 <div id="mn" class="md hide"><div class="card">
   <h3 style="margin-top:0">➕ Nouvelle discussion</h3>
   <label for="ne">E-mail de ton contact</label><input id="ne" type="email" autocomplete="off">
@@ -170,7 +183,7 @@ small{color:var(--mu)}
 <div id="ma" class="md hide"><div class="card">
   <h3 style="margin-top:0">⚙️ Mon compte</h3>
   <p class="s" id="mi"></p>
-  <div class="row"><button class="g" id="nt" type="button">🔔 Activer les alertes</button><button class="g" id="fk" type="button">Oublier toutes mes clés</button></div>
+  <div class="row"><button class="g" id="nt" type="button">🔔 Activer les notifications</button><button class="g" id="fk" type="button">Oublier toutes mes clés</button></div>
   <hr>
   <h3 style="margin-top:0">Changer mon mot de passe</h3>
   <label for="op">Mot de passe actuel</label><input id="op" type="password" autocomplete="current-password">
@@ -180,7 +193,7 @@ small{color:var(--mu)}
   <div class="msg" id="pwm"></div>
   <hr>
   <h3 style="margin-top:0">Comment ça marche</h3>
-  <p class="s">1. Ouvre une discussion avec ➕.<br>2. Convenez d’une <b>clé secrète</b> en dehors de l’application, puis saisis-la via 🔑 (🎲 en génère une solide).<br>3. Écris : le message est chiffré avant l’envoi. Sans la clé, on ne voit qu’un message verrouillé 🔒.<br>4. Case « Retenir la clé » : tes messages s’affichent directement, sans ressaisie.<br>5. Installation : bouton 📲, ou « Sur l’écran d’accueil » sur iPhone.</p>
+  <p class="s">1. Ouvre une discussion avec ➕.<br>2. Convenez d’une <b>clé secrète</b> en dehors de l’application, puis saisis-la via 🔑 (🎲 en génère une solide).<br>3. Écris : le message est chiffré avant l’envoi. Sans la clé, on ne voit qu’un message verrouillé 🔒.<br>4. Case « Retenir la clé » : tes messages s’affichent directement, sans ressaisie.<br>5. Pour répondre à un message précis : touche-le puis ↩️ Répondre (ou glisse-le vers la droite).<br>6. Installation : bouton 📲, ou « Sur l’écran d’accueil » sur iPhone.</p>
   <hr>
   <h3 style="margin-top:0;color:var(--er)">Supprimer mon compte</h3>
   <label for="dp">Mot de passe</label><input id="dp" type="password" autocomplete="current-password">
@@ -207,11 +220,14 @@ small{color:var(--mu)}
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {getAuth,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,sendEmailVerification,sendPasswordResetEmail,updatePassword,reauthenticateWithCredential,EmailAuthProvider,deleteUser} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {getFirestore,doc,getDoc,setDoc,collection,addDoc,query,where,orderBy,limitToLast,onSnapshot,serverTimestamp,deleteDoc,getDocs,writeBatch} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {getMessaging,getToken,isSupported} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging.js";
 
 /* ============ CONFIGURATION (à remplir, voir le guide) ============ */
 const FIREBASE_CONFIG={apiKey:"AIzaSyDK646qSDrrLQOfPi5vn3f7vv1ZNCc_57Q",authDomain:"cryptochat-5bff6.firebaseapp.com",projectId:"cryptochat-5bff6",storageBucket:"cryptochat-5bff6.firebasestorage.app",messagingSenderId:"629421134109",appId:"1:629421134109:web:839edccbb657b8d565d1f4"};
 const ADMIN_UID="YEB3A1ax09bmwo9xxfH6zTfe0K22";   /* ton identifiant utilisateur Firebase (guide, étape 8) */
 const NOTIFY_URL="";  /* optionnel : URL du script d’e-mails (notification.gs) */
+const VAPID_KEY="";   /* notifications push : clé Web Push de Firebase (guide) */
+const PUSH_URL="";    /* notifications push : URL du script push.gs (guide) */
 /* ================================================================== */
 
 const $=i=>document.getElementById(i),show=(i,v)=>$(i).classList.toggle("hide",!v);
@@ -230,6 +246,7 @@ if(!FIREBASE_CONFIG.apiKey){show("ld",false);show("cfg",true);throw new Error("F
 
 const app=initializeApp(FIREBASE_CONFIG),auth=getAuth(app),db=getFirestore(app);
 let me=null,prof=null,convs=new Map(),profs=new Map(),cur=null,unsubC=null,unsubM=null,msgs=[],tok=0,stick=false;
+const shown=new Map();let replyTo=null,menuId=null;
 
 /* ---- crypto (AES-256-GCM, clé dérivée de la clé secrète de la conversation) ---- */
 const b64=u=>{let s="";u.forEach(x=>s+=String.fromCharCode(x));return btoa(s)};
@@ -247,11 +264,13 @@ async function ckey(cid,pass){
   const c=keyCache.get(cid);if(c&&c.p===pass)return c.k;
   const k=await derive(cid,pass);keyCache.set(cid,{p:pass,k});return k;
 }
-async function enc(cid,text){
+async function enc(cid,text,reply){
+  if(reply)text="\u0001"+JSON.stringify({t:text,r:reply});
   const k=await ckey(cid),iv=crypto.getRandomValues(new Uint8Array(12));
   const ct=new Uint8Array(await crypto.subtle.encrypt({name:"AES-GCM",iv},k,te.encode(text)));
   const all=new Uint8Array(12+ct.length);all.set(iv);all.set(ct,12);return "CC2."+b64(all);
 }
+function parse(s){if(s.charCodeAt(0)===1){try{const o=JSON.parse(s.slice(1));return{t:String(o.t||""),r:o.r||null}}catch(e){}}return{t:s,r:null}}
 async function dec(k,ct){const a=unb64(ct.replace(/^CC2\./,""));return td.decode(await crypto.subtle.decrypt({name:"AES-GCM",iv:a.slice(0,12)},k,a.slice(12)))}
 
 /* ---- utilitaires ---- */
@@ -345,6 +364,7 @@ async function startApp(){
   show("adb",!!ADMIN_UID&&uid===ADMIN_UID);
   show("app",true);
   subscribeConvs();
+  enablePush(true);
 }
 
 /* ============ CONVERSATIONS ============ */
@@ -371,6 +391,7 @@ function subscribeConvs(){
     convs=new Map(list.map(c=>[c.id,c]));
     if(cur&&convs.has(cur))markRead(cur);
     renderList();
+    if(location.hash.startsWith("#c=")){const id=location.hash.slice(3);if(convs.has(id)){history.replaceState(null,"",location.pathname);openChat(id)}}
   },e=>console.error(e));
 }
 function renderList(){
@@ -399,7 +420,7 @@ function alertNew(){
 /* ============ DISCUSSION ============ */
 function openChat(cid){
   const c=convs.get(cid);if(!c)return;
-  if(unsubM)unsubM();cur=cid;msgs=[];stick=true;
+  if(unsubM)unsubM();cur=cid;msgs=[];stick=true;clearReply();
   $("ct").textContent=c.name;$("ca").textContent=ini(c.name);$("msgs").textContent="";
   $("app").classList.add("inchat");markRead(cid);renderList();
   const q=query(collection(db,"conversations",cid,"messages"),orderBy("at"),limitToLast(150));
@@ -415,14 +436,18 @@ async function renderMsgs(){
   const box=$("msgs"),near=box.scrollHeight-box.scrollTop-box.clientHeight<140;
   let k=null;try{k=await ckey(cid)}catch(e){}
   const out=[];
-  for(const m of msgs){let x=null;if(k){try{x=await dec(k,m.ct)}catch(e){x=false}}out.push([m,x])}
+  for(const m of msgs){let x=null;if(k){try{x=parse(await dec(k,m.ct))}catch(e){x=false}}out.push([m,x])}
   if(t!==tok||cid!==cur)return;
-  box.textContent="";let last="";
+  box.textContent="";shown.clear();let last="";
   for(const [m,x] of out){
     if(dayOf(m.at)!==last){last=dayOf(m.at);const s=document.createElement("div");s.className="dsep";s.textContent=dayLbl(m.at);box.append(s)}
     const b=document.createElement("div");b.className="b "+(m.from===me.uid?"me":"them");
-    if(typeof x==="string")b.textContent=x;
-    else{b.classList.add("lo");b.textContent=x===false?"⚠️ Illisible avec cette clé":"🔒 Message chiffré — touche pour déchiffrer";b.onclick=openKey}
+    b.dataset.id=m.id;
+    if(x&&typeof x==="object"){
+      shown.set(m.id,{t:x.t,f:m.from});
+      if(x.r){const q=document.createElement("div");q.className="q";const qn=document.createElement("b");qn.textContent=x.r.f===me.uid?"Toi":((convs.get(cid)||{}).name||"Contact");const qs=document.createElement("span");qs.textContent=x.r.s;q.append(qn,qs);q.onclick=ev=>{ev.stopPropagation();jumpTo(x.r.i)};b.append(q)}
+      b.append(document.createTextNode(x.t));b.onclick=()=>openMenu(m.id);swipe(b,m.id);
+    }else{b.classList.add("lo");b.textContent=x===false?"⚠️ Illisible avec cette clé":"🔒 Message chiffré — touche pour déchiffrer";b.onclick=openKey}
     const tm=document.createElement("span");tm.className="tm";tm.textContent=hhmm(m.at);b.append(tm);box.append(b);
   }
   if(near||stick){box.scrollTop=box.scrollHeight;stick=false}
@@ -432,16 +457,45 @@ async function send(){
   if(!getPass(cur)){openKey();say("km","Saisis la clé de cette conversation pour envoyer.");return}
   const cid=cur;
   try{
-    const ct=await enc(cid,text);$("mt").value="";size();
+    const rp=replyTo,ct=await enc(cid,text,rp);$("mt").value="";size();clearReply();
     const b=writeBatch(db);
     b.set(doc(collection(db,"conversations",cid,"messages")),{from:me.uid,ct,at:serverTimestamp()});
     b.update(doc(db,"conversations",cid),{lastAt:serverTimestamp(),lastFrom:me.uid});
-    await b.commit();
+    await b.commit();pingPush(cid);
   }catch(e){console.error(e);if(!$("mt").value)$("mt").value=text;toast("Envoi impossible")}
 }
 const size=()=>{const t=$("mt");t.style.height="46px";t.style.height=Math.min(120,t.scrollHeight)+"px"};
 $("mt").oninput=size;$("sd").onclick=send;
 $("mt").onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey&&matchMedia("(hover:hover)").matches){e.preventDefault();send()}};
+
+/* ============ RÉPONSES ET ACTIONS SUR UN MESSAGE ============ */
+function setReply(id){
+  const m=shown.get(id);if(!m||!cur)return;
+  replyTo={i:id,s:m.t.slice(0,90),f:m.f};
+  $("rbn").textContent="Réponse à "+(m.f===me.uid?"toi-même":(convs.get(cur)||{}).name);$("rbt").textContent=m.t.slice(0,90);
+  show("rb",true);$("mt").focus();
+}
+function clearReply(){replyTo=null;show("rb",false)}
+$("rbx").onclick=clearReply;
+function jumpTo(id){
+  const el=$("msgs").querySelector('[data-id="'+id+'"]');
+  if(!el)return toast("Ce message est plus ancien et n’est pas chargé.");
+  el.scrollIntoView({block:"center",behavior:"smooth"});el.classList.add("fl");setTimeout(()=>el.classList.remove("fl"),1400);
+}
+function swipe(el,id){
+  let x0=0,y0=0;
+  el.addEventListener("touchstart",e=>{x0=e.touches[0].clientX;y0=e.touches[0].clientY},{passive:true});
+  el.addEventListener("touchend",e=>{const t=e.changedTouches[0];if(t.clientX-x0>70&&Math.abs(t.clientY-y0)<40)setReply(id)},{passive:true});
+}
+function openMenu(id){const m=shown.get(id);if(!m)return;menuId=id;$("md").classList.toggle("hide",m.f!==me.uid);show("mm",true)}
+$("mq").onclick=()=>show("mm",false);
+$("mr").onclick=()=>{show("mm",false);setReply(menuId)};
+$("mc").onclick=()=>{show("mm",false);const m=shown.get(menuId);if(m)copy(m.t).then(()=>toast("Copié ✔"),()=>toast("Copie impossible"))};
+$("md").onclick=async()=>{
+  show("mm",false);
+  if(!menuId||!confirm("Supprimer ce message pour tout le monde ?"))return;
+  try{await deleteDoc(doc(db,"conversations",cur,"messages",menuId))}catch(e){toast("Suppression impossible")}
+};
 
 /* ============ CLÉ DE LA CONVERSATION (option C) ============ */
 function openKey(){
@@ -497,12 +551,37 @@ $("nv").onclick=()=>{
 /* ============ COMPTE ============ */
 $("ab").onclick=()=>{say("pwm","");say("dlm","");show("ma",true)};
 $("mx").onclick=()=>show("ma",false);
-$("lo").onclick=()=>{show("ma",false);signOut(auth)};
+$("lo").onclick=async()=>{show("ma",false);await dropPush();signOut(auth)};
 $("fk").onclick=()=>{Object.keys(localStorage).filter(k=>k.startsWith("cck_"+me.uid+"_")).forEach(k=>localStorage.removeItem(k));memKeys.clear();keyCache.clear();renderMsgs();toast("Toutes les clés ont été oubliées")};
-$("nt").onclick=async()=>{
-  if(!("Notification" in window))return toast("Alertes non prises en charge ici");
-  const r=await Notification.requestPermission();toast(r==="granted"?"Alertes activées (application ouverte)":"Alertes refusées")
-};
+let pushTok=null;
+async function enablePush(silent){
+  if(!("Notification" in window))return silent||toast("Notifications non prises en charge ici");
+  if(Notification.permission!=="granted"){
+    if(silent)return;
+    if(await Notification.requestPermission()!=="granted")return toast("Notifications refusées");
+  }
+  if(!VAPID_KEY||!PUSH_URL)return silent||toast("Alertes activées (application ouverte). Push complet non configuré.");
+  try{
+    if(!(await isSupported()))return silent||toast("Push non pris en charge sur cet appareil");
+    const reg=await navigator.serviceWorker.ready;
+    const t=await getToken(getMessaging(app),{vapidKey:VAPID_KEY,serviceWorkerRegistration:reg});
+    if(!t)return;
+    await setDoc(doc(db,"pushTokens",t),{uid:me.uid,at:serverTimestamp()});
+    pushTok=t;localStorage.setItem("cc_ptok_"+me.uid,t);
+    if(!silent)toast("Notifications activées ✔");
+  }catch(e){console.error(e);if(!silent)toast("Activation impossible ("+((e&&e.code)||"erreur")+")")}
+}
+async function dropPush(){
+  if(!me)return;
+  const t=pushTok||localStorage.getItem("cc_ptok_"+me.uid);
+  if(t)try{await deleteDoc(doc(db,"pushTokens",t))}catch(e){}
+  localStorage.removeItem("cc_ptok_"+me.uid);pushTok=null;
+}
+function pingPush(cid){
+  if(!PUSH_URL)return;
+  me.getIdToken().then(t=>fetch(PUSH_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({idToken:t,cid})})).catch(()=>{});
+}
+$("nt").onclick=()=>run("Activation…",()=>enablePush(false));
 $("pb").onclick=()=>{
   const np=$("np").value;
   if(!$("op").value)return say("pwm","Saisis ton mot de passe actuel.","e");
@@ -526,7 +605,7 @@ $("db").onclick=()=>{
       await deleteDoc(doc(db,"directory",email));await deleteDoc(doc(db,"profiles",uid));await deleteDoc(doc(db,"users",uid));
       Object.keys(localStorage).filter(k=>k.includes("_"+uid+"_")).forEach(k=>localStorage.removeItem(k));
       notify({type:"delete",nom:u.nom||"",prenom:u.prenom||"",email,telephone:u.telephone||""});
-      await deleteUser(me);$("dp").value="";show("ma",false);
+      await dropPush();await deleteUser(me);$("dp").value="";show("ma",false);
     }catch(e){say("dlm",aerr(e),"e")}
   });
 };
@@ -565,7 +644,7 @@ let dp=null;
 addEventListener("beforeinstallprompt",e=>{e.preventDefault();dp=e;show("inst",true)});
 addEventListener("appinstalled",()=>show("inst",false));
 $("inst").onclick=()=>{if(dp){dp.prompt();dp=null;show("inst",false)}};
-if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+if("serviceWorker" in navigator){addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));navigator.serviceWorker.addEventListener("message",e=>{const c=e.data&&e.data.cid;if(c&&convs.has(c))openChat(c)})}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&cur){markRead(cur);renderList()}});
 </script>
 </body>
