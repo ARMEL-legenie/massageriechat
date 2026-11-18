@@ -81,6 +81,21 @@ small{color:var(--mu)}
 #rb{display:flex;align-items:center;gap:10px;padding:8px 12px;border-top:1px solid var(--bd);background:rgba(0,0,0,.22)}
 #rb>div{flex:1;min-width:0;border-left:3px solid var(--b);padding-left:8px}
 #rb small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.b{position:relative;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.b.dl{background:rgba(255,255,255,.05);border:1px dashed var(--bd);font-style:italic;color:var(--mu)}
+.b.sl{outline:2px solid var(--b)}
+.fw{font-size:.72rem;opacity:.8;margin-bottom:3px;font-style:italic}
+.fm{position:relative;margin-bottom:5px;cursor:pointer}
+.fm .th{display:block;max-width:100%;max-height:220px;border-radius:10px}
+.fm .pl{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);font-size:1.6rem;background:rgba(0,0,0,.5);border-radius:50%;width:52px;height:52px;display:grid;place-items:center}
+.fm .ic{font-size:2.2rem}
+.fm small{display:block;color:inherit;opacity:.8;margin-top:3px;word-break:break-all}
+#pbar{display:flex;align-items:center;gap:10px;padding:8px 12px;border-top:1px solid var(--bd);background:rgba(0,0,0,.22)}
+#pbar img{width:44px;height:44px;object-fit:cover;border-radius:8px}
+#pbar span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.85rem}
+.fr{display:flex;gap:10px;align-items:center;padding:10px 4px;border-bottom:1px solid var(--bd);cursor:pointer}
+.fr.off{opacity:.5}.fr input{width:20px;height:20px;accent-color:var(--a)}
+#cv{width:100%;max-height:60dvh;background:#000;border-radius:14px}
 /* chargement */
 #ld{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:rgba(5,6,16,.72);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
 .ldb{background:#171a33;border:1px solid var(--bd);border-radius:20px;padding:26px 30px;text-align:center;width:min(86vw,320px)}
@@ -147,10 +162,12 @@ small{color:var(--mu)}
     <p class="s hide" id="lempty" style="padding:24px;text-align:center">Aucune discussion.<br>Appuie sur ➕ pour écrire à quelqu’un avec son e-mail.</p>
   </aside>
   <section id="chat">
-    <div class="hd"><button class="ib bk" id="bk">←</button><div class="av" id="ca">?</div><b id="ct"></b><button class="ib" id="kb" title="Clé de la conversation">🔑</button></div>
+    <div class="hd" id="ch"><button class="ib bk" id="bk">←</button><div class="av" id="ca">?</div><b id="ct"></b><button class="ib" id="sl0" title="Sélectionner des messages">☑️</button><button class="ib" id="kb" title="Clé de la conversation">🔑</button></div>
+    <div id="sb" class="hd hide"><button class="ib" id="sxc" type="button">✕</button><b id="sn">0</b><button class="ib" id="sfw" type="button">↪ Transférer</button><button class="ib" id="sdel" type="button">🗑 Supprimer</button></div>
     <div id="msgs"></div>
     <div id="rb" class="hide"><div><b id="rbn" style="display:block;color:var(--b);font-size:.78rem"></b><small id="rbt"></small></div><button class="ib" id="rbx" type="button">✕</button></div>
-    <div class="cm"><textarea id="mt" placeholder="Écris ton message… (chiffré automatiquement)" rows="1"></textarea><button id="sd" title="Envoyer">🔒 Envoyer</button></div>
+    <div id="pbar" class="hide"><img id="pth" class="hide" alt=""><span id="pnm"></span><button class="ib" id="pcx" type="button">✕</button></div>
+    <div class="cm"><button class="ib" id="at" type="button" title="Joindre">📎</button><textarea id="mt" placeholder="Écris ton message… (chiffré automatiquement)" rows="1"></textarea><button id="sd" title="Envoyer">🔒 Envoyer</button></div>
   </section>
   <section id="empty"><div><div style="font-size:3rem">🔐</div><p>Choisis une discussion<br>ou démarre-en une avec ➕</p></div></section>
 </div>
@@ -168,8 +185,44 @@ small{color:var(--mu)}
 </div></div>
 
 <div id="mm" class="md hide"><div class="card">
-  <div class="row" style="margin-top:0"><button id="mr" type="button">↩️ Répondre</button><button class="g" id="mc" type="button">📋 Copier</button><button class="g dg" id="md" type="button">🗑️ Supprimer pour tous</button></div>
+  <div class="row" style="margin-top:0"><button id="mr" type="button">↩️ Répondre</button><button class="g" id="mfw" type="button">↪ Transférer</button><button class="g" id="mc" type="button">📋 Copier</button><button class="g" id="msl" type="button">☑️ Sélectionner</button><button class="g dg" id="md" type="button">🗑️ Supprimer</button></div>
   <button class="lk" id="mq" type="button">Fermer</button>
+</div></div>
+
+<div id="mdl" class="md hide"><div class="card">
+  <p class="s" id="dlt" style="margin:0"></p>
+  <div class="row"><button class="g dg" id="dlall" type="button"></button><button class="g" id="dlme" type="button"></button></div>
+  <button class="lk" id="dlx" type="button">Annuler</button>
+</div></div>
+
+<div id="mf" class="md hide"><div class="card">
+  <h3 style="margin-top:0">↪ Transférer vers…</h3>
+  <p class="s">Chaque message est rechiffré avec la clé de la discussion choisie (elle doit être saisie sur cet appareil).</p>
+  <div id="mfl" style="margin-top:8px"></div>
+  <button class="w" id="mfs" type="button">Transférer</button>
+  <button class="lk" id="mfx" type="button">Annuler</button>
+  <div class="msg" id="mfm"></div>
+</div></div>
+
+<div id="mat" class="md hide"><div class="card">
+  <h3 style="margin-top:0">📎 Joindre</h3>
+  <div class="row" style="margin-top:0"><button id="acam" type="button">📷 Caméra (photo / vidéo)</button><button class="g" id="agal" type="button">🖼️ Photo ou vidéo de l’appareil</button><button class="g" id="adoc" type="button">📄 Document</button></div>
+  <p class="s" style="margin-top:10px">Tout est chiffré avec la clé de la discussion. Taille maximale : 5 Mo (vidéo filmée : 20 secondes).</p>
+  <button class="lk" id="atx" type="button">Fermer</button>
+</div></div>
+<input type="file" id="fgal" accept="image/*,video/*" class="hide">
+<input type="file" id="fdoc" class="hide">
+
+<div id="mcam" class="md hide"><div class="card" style="text-align:center">
+  <video id="cv" autoplay playsinline muted></video>
+  <div class="msg" id="ctm" style="text-align:center"></div>
+  <div class="row"><button class="g" id="csw" type="button">🔄</button><button id="cphoto" type="button">📸 Photo</button><button class="dg" id="crec" type="button">⏺ Filmer</button><button class="g" id="cclose" type="button">✕</button></div>
+</div></div>
+
+<div id="mv" class="md hide"><div class="card" style="text-align:center">
+  <b id="mvn" style="display:block;margin-bottom:8px;word-break:break-all"></b>
+  <div id="mvc"></div>
+  <div class="row"><button id="mvs" type="button">💾 Enregistrer</button><button class="g" id="mvx" type="button">Fermer</button></div>
 </div></div>
 
 <div id="mn" class="md hide"><div class="card">
@@ -193,7 +246,7 @@ small{color:var(--mu)}
   <div class="msg" id="pwm"></div>
   <hr>
   <h3 style="margin-top:0">Comment ça marche</h3>
-  <p class="s">1. Ouvre une discussion avec ➕.<br>2. Convenez d’une <b>clé secrète</b> en dehors de l’application, puis saisis-la via 🔑 (🎲 en génère une solide).<br>3. Écris : le message est chiffré avant l’envoi. Sans la clé, on ne voit qu’un message verrouillé 🔒.<br>4. Case « Retenir la clé » : tes messages s’affichent directement, sans ressaisie.<br>5. Pour répondre à un message précis : touche-le puis ↩️ Répondre (ou glisse-le vers la droite).<br>6. Installation : bouton 📲, ou « Sur l’écran d’accueil » sur iPhone.</p>
+  <p class="s">1. Ouvre une discussion avec ➕.<br>2. Convenez d’une <b>clé secrète</b> en dehors de l’application, puis saisis-la via 🔑 (🎲 en génère une solide).<br>3. Écris : le message est chiffré avant l’envoi. Sans la clé, on ne voit qu’un message verrouillé 🔒.<br>4. Case « Retenir la clé » : tes messages s’affichent directement, sans ressaisie.<br>5. Pour répondre à un message précis : touche-le puis ↩️ Répondre (ou glisse-le vers la droite).<br>6. 📎 pour envoyer une photo, une vidéo (caméra intégrée, 20 s max) ou un fichier (5 Mo max). Appui long sur un message pour en sélectionner plusieurs (supprimer ou transférer).<br>7. Installation : bouton 📲, ou « Sur l’écran d’accueil » sur iPhone.</p>
   <hr>
   <h3 style="margin-top:0;color:var(--er)">Supprimer mon compte</h3>
   <label for="dp">Mot de passe</label><input id="dp" type="password" autocomplete="current-password">
@@ -246,7 +299,8 @@ if(!FIREBASE_CONFIG.apiKey){show("ld",false);show("cfg",true);throw new Error("F
 
 const app=initializeApp(FIREBASE_CONFIG),auth=getAuth(app),db=getFirestore(app);
 let me=null,prof=null,convs=new Map(),profs=new Map(),cur=null,unsubC=null,unsubM=null,msgs=[],tok=0,stick=false;
-const shown=new Map();let replyTo=null,menuId=null;
+const shown=new Map(),sel=new Set(),blobCache=new Map();
+let replyTo=null,menuId=null,selMode=false,pend=null,viewer=null,delIds=[],fwIds=[];
 
 /* ---- crypto (AES-256-GCM, clé dérivée de la clé secrète de la conversation) ---- */
 const b64=u=>{let s="";u.forEach(x=>s+=String.fromCharCode(x));return btoa(s)};
@@ -270,7 +324,17 @@ async function enc(cid,text,reply){
   const ct=new Uint8Array(await crypto.subtle.encrypt({name:"AES-GCM",iv},k,te.encode(text)));
   const all=new Uint8Array(12+ct.length);all.set(iv);all.set(ct,12);return "CC2."+b64(all);
 }
-function parse(s){if(s.charCodeAt(0)===1){try{const o=JSON.parse(s.slice(1));return{t:String(o.t||""),r:o.r||null}}catch(e){}}return{t:s,r:null}}
+function parse(s){
+  if(s.charCodeAt(0)===1){
+    try{
+      const o=JSON.parse(s.slice(1)),f=o.file&&typeof o.file==="object"?{n:String(o.file.n||"fichier").slice(0,120),m:String(o.file.m||"application/octet-stream").slice(0,80),z:Number(o.file.z)||0,th:/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]{1,40000}$/.test(o.file.th||"")?o.file.th:""}:null;
+      const r=o.r&&typeof o.r==="object"?{i:String(o.r.i||""),s:String(o.r.s||"").slice(0,120),f:String(o.r.f||"")}:null;
+      return{t:String(o.t||""),r,fw:!!o.fw,file:f};
+    }catch(e){}
+  }
+  return{t:s,r:null,fw:false,file:null};
+}
+const encObj=(cid,o)=>enc(cid,(o.r||o.fw||o.file)?"\u0001"+JSON.stringify(o):o.t);
 async function dec(k,ct){const a=unb64(ct.replace(/^CC2\./,""));return td.decode(await crypto.subtle.decrypt({name:"AES-GCM",iv:a.slice(0,12)},k,a.slice(12)))}
 
 /* ---- utilitaires ---- */
@@ -347,7 +411,7 @@ onAuthStateChanged(auth,async u=>{
 });
 function cleanup(){
   if(unsubC)unsubC();if(unsubM)unsubM();unsubC=unsubM=null;
-  convs=new Map();cur=null;msgs=[];memKeys.clear();keyCache.clear();
+  convs=new Map();cur=null;msgs=[];memKeys.clear();keyCache.clear();blobCache.forEach(u=>URL.revokeObjectURL(u));blobCache.clear();sel.clear();selMode=false;pend=null;
   $("app").classList.remove("inchat");$("list").textContent="";$("msgs").textContent="";document.title="CryptoChat";
 }
 
@@ -420,59 +484,89 @@ function alertNew(){
 /* ============ DISCUSSION ============ */
 function openChat(cid){
   const c=convs.get(cid);if(!c)return;
-  if(unsubM)unsubM();cur=cid;msgs=[];stick=true;clearReply();
+  if(unsubM)unsubM();cur=cid;msgs=[];stick=true;clearReply();exitSel();clearPend();
   $("ct").textContent=c.name;$("ca").textContent=ini(c.name);$("msgs").textContent="";
   $("app").classList.add("inchat");markRead(cid);renderList();
   const q=query(collection(db,"conversations",cid,"messages"),orderBy("at"),limitToLast(150));
   unsubM=onSnapshot(q,snap=>{
-    msgs=snap.docs.map(d=>{const x=d.data({serverTimestamps:"estimate"});return{id:d.id,from:x.from,ct:x.ct,at:x.at?x.at.toMillis():Date.now()}});
+    msgs=snap.docs.map(d=>{const x=d.data({serverTimestamps:"estimate"});return{id:d.id,from:x.from,ct:x.ct||"",at:x.at?x.at.toMillis():Date.now(),fid:x.fid||"",nc:x.nc||0,del:!!x.deleted}});
     markRead(cid);renderMsgs();
   },e=>{console.error(e);toast("Lecture impossible")});
   if(!getPass(cid)&&!localStorage.getItem("cc_tip"))toast("Appuie sur 🔑 pour saisir la clé de la conversation");
 }
-$("bk").onclick=()=>{if(unsubM)unsubM();unsubM=null;cur=null;$("app").classList.remove("inchat");renderList()};
+$("bk").onclick=()=>{exitSel();clearPend();if(unsubM)unsubM();unsubM=null;cur=null;$("app").classList.remove("inchat");renderList()};
 async function renderMsgs(){
   const t=++tok,cid=cur;if(!cid)return;
   const box=$("msgs"),near=box.scrollHeight-box.scrollTop-box.clientHeight<140;
   let k=null;try{k=await ckey(cid)}catch(e){}
-  const out=[];
-  for(const m of msgs){let x=null;if(k){try{x=parse(await dec(k,m.ct))}catch(e){x=false}}out.push([m,x])}
+  const hid=hiddenSet(cid),out=[];
+  for(const m of msgs){
+    if(hid.has(m.id))continue;
+    let x=null;
+    if(!m.del&&k){try{x=parse(await dec(k,m.ct))}catch(e){x=false}}
+    out.push([m,x]);
+  }
   if(t!==tok||cid!==cur)return;
   box.textContent="";shown.clear();let last="";
   for(const [m,x] of out){
     if(dayOf(m.at)!==last){last=dayOf(m.at);const s=document.createElement("div");s.className="dsep";s.textContent=dayLbl(m.at);box.append(s)}
-    const b=document.createElement("div");b.className="b "+(m.from===me.uid?"me":"them");
-    b.dataset.id=m.id;
-    if(x&&typeof x==="object"){
-      shown.set(m.id,{t:x.t,f:m.from});
+    const mine=m.from===me.uid,b=document.createElement("div");b.className="b "+(mine?"me":"them");b.dataset.id=m.id;
+    if(m.del){b.classList.add("dl");b.textContent=mine?"🚫 Tu as supprimé ce message":"🚫 Ce message a été supprimé"}
+    else if(x&&typeof x==="object"){
+      shown.set(m.id,{t:x.t,f:m.from,file:x.file,fid:m.fid,nc:m.nc,fw:x.fw});
+      if(x.fw){const f=document.createElement("div");f.className="fw";f.textContent="↪ Transféré";b.append(f)}
       if(x.r){const q=document.createElement("div");q.className="q";const qn=document.createElement("b");qn.textContent=x.r.f===me.uid?"Toi":((convs.get(cid)||{}).name||"Contact");const qs=document.createElement("span");qs.textContent=x.r.s;q.append(qn,qs);q.onclick=ev=>{ev.stopPropagation();jumpTo(x.r.i)};b.append(q)}
-      b.append(document.createTextNode(x.t));b.onclick=()=>openMenu(m.id);swipe(b,m.id);
-    }else{b.classList.add("lo");b.textContent=x===false?"⚠️ Illisible avec cette clé":"🔒 Message chiffré — touche pour déchiffrer";b.onclick=openKey}
+      if(x.file)b.append(fileEl(m,x.file));
+      if(x.t)b.append(document.createTextNode(x.t));
+      b.onclick=()=>{if(lpFired){lpFired=false;return}if(selMode)toggleSel(m.id);else openMenu(m.id)};
+      swipe(b,m.id);press(b,m.id);
+      if(sel.has(m.id))b.classList.add("sl");
+    }else{
+      b.classList.add("lo");b.textContent=x===false?"⚠️ Illisible avec cette clé":"🔒 Message chiffré — touche pour déchiffrer";b.onclick=openKey;
+    }
     const tm=document.createElement("span");tm.className="tm";tm.textContent=hhmm(m.at);b.append(tm);box.append(b);
   }
+  for(const id of [...sel])if(!shown.has(id))sel.delete(id);
+  if(selMode&&!sel.size)exitSel();else if(selMode)updSel();
   if(near||stick){box.scrollTop=box.scrollHeight;stick=false}
 }
+async function postMsg(cid,obj,extra){
+  const ct=await encObj(cid,obj),b=writeBatch(db);
+  b.set(doc(collection(db,"conversations",cid,"messages")),{from:me.uid,ct,at:serverTimestamp(),...(extra||{})});
+  b.update(doc(db,"conversations",cid),{lastAt:serverTimestamp(),lastFrom:me.uid});
+  await b.commit();
+}
 async function send(){
-  const text=$("mt").value.trim();if(!text||!cur)return;
+  if(!cur)return;
+  const text=$("mt").value.trim();if(!text&&!pend)return;
   if(!getPass(cur)){openKey();say("km","Saisis la clé de cette conversation pour envoyer.");return}
-  const cid=cur;
+  const cid=cur,rp=replyTo,pe=pend;
+  if(pe){
+    return run("Envoi du fichier…",async()=>{
+      try{
+        const f=await putFile(cid,pe.bytes);
+        await postMsg(cid,{t:text,r:rp,file:{n:pe.name,m:pe.mime,z:pe.size,th:pe.th}},f);
+        $("mt").value="";size();clearReply();clearPend();pingPush(cid);
+      }catch(e){console.error(e);toast("Envoi impossible")}
+    });
+  }
   try{
-    const rp=replyTo,ct=await enc(cid,text,rp);$("mt").value="";size();clearReply();
-    const b=writeBatch(db);
-    b.set(doc(collection(db,"conversations",cid,"messages")),{from:me.uid,ct,at:serverTimestamp()});
-    b.update(doc(db,"conversations",cid),{lastAt:serverTimestamp(),lastFrom:me.uid});
-    await b.commit();pingPush(cid);
+    $("mt").value="";size();clearReply();
+    await postMsg(cid,{t:text,r:rp});pingPush(cid);
   }catch(e){console.error(e);if(!$("mt").value)$("mt").value=text;toast("Envoi impossible")}
 }
 const size=()=>{const t=$("mt");t.style.height="46px";t.style.height=Math.min(120,t.scrollHeight)+"px"};
 $("mt").oninput=size;$("sd").onclick=send;
 $("mt").onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey&&matchMedia("(hover:hover)").matches){e.preventDefault();send()}};
 
-/* ============ RÉPONSES ET ACTIONS SUR UN MESSAGE ============ */
+/* ============ RÉPONSES, SÉLECTION, SUPPRESSION, TRANSFERT ============ */
+const hkey=cid=>"cch_"+me.uid+"_"+cid;
+function hiddenSet(cid){try{return new Set(JSON.parse(localStorage.getItem(hkey(cid))||"[]"))}catch(e){return new Set()}}
+const label=m=>m.t||(m.file?(/^image\//.test(m.file.m)?"📷 Photo":/^video\//.test(m.file.m)?"🎥 Vidéo":"📎 "+m.file.n):"");
 function setReply(id){
   const m=shown.get(id);if(!m||!cur)return;
-  replyTo={i:id,s:m.t.slice(0,90),f:m.f};
-  $("rbn").textContent="Réponse à "+(m.f===me.uid?"toi-même":(convs.get(cur)||{}).name);$("rbt").textContent=m.t.slice(0,90);
+  replyTo={i:id,s:label(m).slice(0,90),f:m.f};
+  $("rbn").textContent="Réponse à "+(m.f===me.uid?"toi-même":(convs.get(cur)||{}).name);$("rbt").textContent=replyTo.s;
   show("rb",true);$("mt").focus();
 }
 function clearReply(){replyTo=null;show("rb",false)}
@@ -485,16 +579,249 @@ function jumpTo(id){
 function swipe(el,id){
   let x0=0,y0=0;
   el.addEventListener("touchstart",e=>{x0=e.touches[0].clientX;y0=e.touches[0].clientY},{passive:true});
-  el.addEventListener("touchend",e=>{const t=e.changedTouches[0];if(t.clientX-x0>70&&Math.abs(t.clientY-y0)<40)setReply(id)},{passive:true});
+  el.addEventListener("touchend",e=>{const t=e.changedTouches[0];if(!selMode&&t.clientX-x0>70&&Math.abs(t.clientY-y0)<40)setReply(id)},{passive:true});
 }
-function openMenu(id){const m=shown.get(id);if(!m)return;menuId=id;$("md").classList.toggle("hide",m.f!==me.uid);show("mm",true)}
+let lpT=null,lpFired=false;
+function press(el,id){
+  let px=0,py=0;
+  el.addEventListener("pointerdown",e=>{px=e.clientX;py=e.clientY;lpFired=false;clearTimeout(lpT);lpT=setTimeout(()=>{lpFired=true;if(selMode)toggleSel(id);else enterSel(id)},480)});
+  const stop=()=>clearTimeout(lpT);
+  el.addEventListener("pointerup",stop);el.addEventListener("pointerleave",stop);el.addEventListener("pointercancel",stop);
+  el.addEventListener("pointermove",e=>{if(Math.abs(e.clientX-px)>10||Math.abs(e.clientY-py)>10)stop()});
+  el.addEventListener("contextmenu",e=>{e.preventDefault();if(!selMode)enterSel(id)});
+}
+function openMenu(id){if(!shown.has(id))return;menuId=id;show("mm",true)}
 $("mq").onclick=()=>show("mm",false);
 $("mr").onclick=()=>{show("mm",false);setReply(menuId)};
-$("mc").onclick=()=>{show("mm",false);const m=shown.get(menuId);if(m)copy(m.t).then(()=>toast("Copié ✔"),()=>toast("Copie impossible"))};
-$("md").onclick=async()=>{
-  show("mm",false);
-  if(!menuId||!confirm("Supprimer ce message pour tout le monde ?"))return;
-  try{await deleteDoc(doc(db,"conversations",cur,"messages",menuId))}catch(e){toast("Suppression impossible")}
+$("mc").onclick=()=>{show("mm",false);const m=shown.get(menuId);if(!m||!m.t)return toast("Rien à copier");copy(m.t).then(()=>toast("Copié ✔"),()=>toast("Copie impossible"))};
+$("msl").onclick=()=>{show("mm",false);enterSel(menuId)};
+$("mfw").onclick=()=>{show("mm",false);openForward([menuId])};
+$("md").onclick=()=>{show("mm",false);askDelete([menuId])};
+
+/* sélection multiple */
+function enterSel(id){selMode=true;sel.clear();if(id)sel.add(id);updSel()}
+function exitSel(){selMode=false;sel.clear();updSel()}
+function toggleSel(id){if(sel.has(id))sel.delete(id);else sel.add(id);if(!sel.size)return exitSel();updSel()}
+function updSel(){
+  show("sb",selMode);show("ch",!selMode);$("sn").textContent=sel.size+" sélectionné"+(sel.size>1?"s":"");
+  $("msgs").querySelectorAll(".b[data-id]").forEach(b=>b.classList.toggle("sl",sel.has(b.dataset.id)));
+}
+$("sl0").onclick=()=>enterSel(null);$("sxc").onclick=exitSel;
+$("sdel").onclick=()=>{if(sel.size)askDelete([...sel])};
+$("sfw").onclick=()=>{if(sel.size)openForward([...sel])};
+
+/* suppression : pour tous (mes messages) ou pour moi */
+function askDelete(ids){
+  delIds=ids.filter(i=>shown.has(i));if(!delIds.length)return;
+  const own=delIds.filter(i=>shown.get(i).f===me.uid);
+  $("dlt").textContent=delIds.length+" message"+(delIds.length>1?"s":"")+" sélectionné"+(delIds.length>1?"s":"");
+  $("dlall").textContent="🗑 Supprimer pour tous ("+own.length+" de mes messages)";show("dlall",own.length>0);
+  $("dlme").textContent="🙈 Supprimer pour moi ("+delIds.length+")";show("mdl",true);
+}
+$("dlx").onclick=()=>show("mdl",false);
+$("dlme").onclick=()=>{
+  const h=hiddenSet(cur);delIds.forEach(i=>h.add(i));localStorage.setItem(hkey(cur),JSON.stringify([...h]));
+  show("mdl",false);exitSel();renderMsgs();toast("Supprimé pour toi");
+};
+$("dlall").onclick=()=>{
+  show("mdl",false);
+  const cid=cur,own=delIds.filter(i=>shown.get(i).f===me.uid),files=own.map(i=>shown.get(i)).filter(s=>s.fid);
+  return run("Suppression…",async()=>{
+    try{
+      for(let i=0;i<own.length;i+=200){
+        const b=writeBatch(db);
+        own.slice(i,i+200).forEach(id=>b.update(doc(db,"conversations",cid,"messages",id),{deleted:true,ct:""}));
+        await b.commit();
+      }
+      for(const s of files){
+        const b=writeBatch(db);
+        for(let j=0;j<s.nc;j++)b.delete(doc(db,"conversations",cid,"blobs",s.fid+"_"+j));
+        await b.commit().catch(()=>{});
+      }
+      exitSel();toast("Supprimé pour tous ✔");
+    }catch(e){console.error(e);toast("Suppression impossible")}
+  });
+};
+
+/* ============ FICHIERS CHIFFRÉS (stockés par morceaux dans Firestore) ============ */
+const MAXB=5*1024*1024,CH=650000;
+const rid=()=>b64(crypto.getRandomValues(new Uint8Array(12))).replace(/[^A-Za-z0-9]/g,"x");
+const bytes2b64=u=>{let s="";for(let i=0;i<u.length;i+=32768)s+=String.fromCharCode.apply(null,u.subarray(i,i+32768));return btoa(s)};
+const b642bytes=t=>{const s=atob(t),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u};
+const setProg=t=>{$("ldt").textContent=t};
+const fsize=n=>n>1048576?(n/1048576).toFixed(1)+" Mo":Math.max(1,Math.round(n/1024))+" Ko";
+async function encBytes(k,u8){
+  const iv=crypto.getRandomValues(new Uint8Array(12)),ct=new Uint8Array(await crypto.subtle.encrypt({name:"AES-GCM",iv},k,u8));
+  const o=new Uint8Array(12+ct.length);o.set(iv);o.set(ct,12);return o;
+}
+async function decBytes(k,u8){return new Uint8Array(await crypto.subtle.decrypt({name:"AES-GCM",iv:u8.slice(0,12)},k,u8.slice(12)))}
+async function putFile(cid,u8){
+  const k=await ckey(cid),s=bytes2b64(await encBytes(k,u8)),nc=Math.ceil(s.length/CH),fid=rid();
+  for(let i=0;i<nc;i++){
+    setProg("Envoi du fichier "+(i+1)+"/"+nc+"…");
+    await setDoc(doc(db,"conversations",cid,"blobs",fid+"_"+i),{from:me.uid,i,d:s.slice(i*CH,(i+1)*CH)});
+  }
+  return {fid,nc};
+}
+async function getFile(cid,m){
+  const k=await ckey(cid);
+  const parts=await Promise.all(Array.from({length:m.nc},(_,i)=>getDoc(doc(db,"conversations",cid,"blobs",m.fid+"_"+i))));
+  if(parts.some(p=>!p.exists()))throw new Error("manquant");
+  return decBytes(k,b642bytes(parts.map(p=>p.data().d).join("")));
+}
+function fileEl(m,f){
+  const w=document.createElement("div");w.className="fm";
+  const kind=/^image\//.test(f.m)?"img":/^video\//.test(f.m)?"vid":"doc";
+  if(f.th&&kind!=="doc"){
+    const i=document.createElement("img");i.src=f.th;i.className="th";w.append(i);
+    if(kind==="vid"){const p=document.createElement("span");p.className="pl";p.textContent="▶";w.append(p)}
+  }else{const i=document.createElement("div");i.className="ic";i.textContent=kind==="img"?"🖼️":kind==="vid"?"🎥":"📎";w.append(i)}
+  const n=document.createElement("small");n.textContent=f.n+" · "+fsize(f.z)+" · touche pour ouvrir";w.append(n);
+  w.onclick=ev=>{ev.stopPropagation();if(lpFired){lpFired=false;return}if(selMode)toggleSel(m.id);else openFile(m,f)};
+  return w;
+}
+function openFile(m,f){
+  const cid=cur,key=cid+m.fid;
+  return run("Chargement du fichier…",async()=>{
+    try{
+      let u=blobCache.get(key);
+      if(!u){
+        const bytes=await getFile(cid,m),type=/^(image|video|audio)\//.test(f.m)?f.m:"application/octet-stream";
+        u=URL.createObjectURL(new Blob([bytes],{type}));blobCache.set(key,u);
+      }
+      showViewer(u,f);
+    }catch(e){console.error(e);toast("Fichier introuvable ou clé incorrecte")}
+  });
+}
+function showViewer(u,f){
+  const c=$("mvc");c.textContent="";let el;
+  if(/^image\//.test(f.m)){el=new Image();el.src=u}
+  else if(/^video\//.test(f.m)){el=document.createElement("video");el.src=u;el.controls=true;el.playsInline=true}
+  else if(/^audio\//.test(f.m)){el=document.createElement("audio");el.src=u;el.controls=true}
+  else{el=document.createElement("p");el.className="s";el.textContent="📎 "+f.n+" · "+fsize(f.z)}
+  el.style.maxWidth="100%";el.style.maxHeight="60dvh";c.append(el);
+  $("mvn").textContent=f.n;viewer={u,f};show("mv",true);
+}
+$("mvs").onclick=()=>{if(!viewer)return;const a=document.createElement("a");a.href=viewer.u;a.download=viewer.f.n||"fichier";document.body.append(a);a.click();a.remove()};
+$("mvx").onclick=()=>{show("mv",false);$("mvc").textContent=""};
+
+/* pièce jointe en attente */
+function clearPend(){pend=null;show("pbar",false)}
+$("pcx").onclick=clearPend;
+function thumbOf(src,w,h){
+  const sc=Math.min(1,160/Math.max(w,h)),c=document.createElement("canvas");
+  c.width=Math.max(1,Math.round(w*sc));c.height=Math.max(1,Math.round(h*sc));
+  c.getContext("2d").drawImage(src,0,0,c.width,c.height);return c.toDataURL("image/jpeg",.5);
+}
+function vthumb(blob){
+  return new Promise(res=>{
+    const v=document.createElement("video"),u=URL.createObjectURL(blob);let ended=false;
+    const done=r=>{if(ended)return;ended=true;URL.revokeObjectURL(u);res(r)};
+    v.muted=true;v.playsInline=true;v.preload="metadata";v.src=u;
+    v.onloadeddata=()=>{v.currentTime=Math.min(.2,(v.duration||1)/2)};
+    v.onseeked=()=>{try{done(thumbOf(v,v.videoWidth,v.videoHeight))}catch(e){done("")}};
+    v.onerror=()=>done("");setTimeout(()=>done(""),4000);
+  });
+}
+function attach(file){
+  if(!file)return;
+  return run("Préparation du fichier…",async()=>{
+    try{
+      let blob=file,mime=file.type||"application/octet-stream",name=file.name||"fichier",th="";
+      if(/^image\//.test(mime)){
+        try{
+          const bm=await createImageBitmap(file);th=thumbOf(bm,bm.width,bm.height);
+          if(mime!=="image/gif"){
+            const sc=Math.min(1,1600/Math.max(bm.width,bm.height)),c=document.createElement("canvas");
+            c.width=Math.round(bm.width*sc);c.height=Math.round(bm.height*sc);c.getContext("2d").drawImage(bm,0,0,c.width,c.height);
+            let q=.82;do{blob=await new Promise(r=>c.toBlob(r,"image/jpeg",q));q-=.12}while(blob&&blob.size>MAXB&&q>.3);
+            mime="image/jpeg";name=name.replace(/\.[^.]+$/,"")+".jpg";
+          }
+        }catch(e){th=""}
+      }else if(/^video\//.test(mime)){th=await vthumb(file)}
+      if(!blob||blob.size>MAXB)return toast("Fichier trop lourd (5 Mo maximum).");
+      pend={bytes:new Uint8Array(await blob.arrayBuffer()),name,mime,size:blob.size,th};
+      $("pnm").textContent=name+" · "+fsize(blob.size);
+      if(th){$("pth").src=th;show("pth",true)}else show("pth",false);
+      show("pbar",true);$("mt").focus();
+    }catch(e){console.error(e);toast("Fichier illisible")}
+  });
+}
+$("at").onclick=()=>show("mat",true);
+$("atx").onclick=()=>show("mat",false);
+$("agal").onclick=()=>{show("mat",false);$("fgal").click()};
+$("adoc").onclick=()=>{show("mat",false);$("fdoc").click()};
+$("fgal").onchange=e=>{const f=e.target.files[0];e.target.value="";attach(f)};
+$("fdoc").onchange=e=>{const f=e.target.files[0];e.target.value="";attach(f)};
+
+/* caméra intégrée : photo ou vidéo (20 s max) */
+let stream=null,facing="environment",rec=null,recT=null,recChunks=[];
+async function openCam(){
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)return toast("Caméra non disponible ici");
+  try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:facing,width:{ideal:1280},height:{ideal:720}},audio:true})}
+  catch(e){try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:facing}})}catch(x){return toast("Caméra refusée ou indisponible")}}
+  const v=$("cv");v.srcObject=stream;v.muted=true;v.playsInline=true;await v.play().catch(()=>{});
+  $("ctm").textContent="";$("crec").textContent="⏺ Filmer";show("mcam",true);
+}
+function stopCam(){
+  clearInterval(recT);
+  if(rec){try{rec.onstop=null;if(rec.state!=="inactive")rec.stop()}catch(e){}}
+  rec=null;if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;$("cv").srcObject=null;show("mcam",false);
+}
+$("acam").onclick=()=>{show("mat",false);openCam()};
+$("cclose").onclick=stopCam;
+$("csw").onclick=async()=>{if(rec)return;facing=facing==="environment"?"user":"environment";if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;await openCam()};
+$("cphoto").onclick=()=>{
+  const v=$("cv");if(!v.videoWidth)return;
+  const sc=Math.min(1,1600/Math.max(v.videoWidth,v.videoHeight)),c=document.createElement("canvas");
+  c.width=Math.round(v.videoWidth*sc);c.height=Math.round(v.videoHeight*sc);c.getContext("2d").drawImage(v,0,0,c.width,c.height);
+  c.toBlob(b=>{stopCam();if(b)attach(new File([b],"photo-"+Date.now()+".jpg",{type:"image/jpeg"}))},"image/jpeg",.85);
+};
+$("crec").onclick=()=>{
+  if(rec&&rec.state==="recording"){rec.stop();return}
+  if(typeof MediaRecorder==="undefined")return toast("Enregistrement vidéo non pris en charge ici");
+  const mt=["video/webm;codecs=vp8,opus","video/webm","video/mp4"].find(t=>MediaRecorder.isTypeSupported(t))||"";
+  try{rec=new MediaRecorder(stream,Object.assign(mt?{mimeType:mt}:{},{videoBitsPerSecond:700000,audioBitsPerSecond:64000}))}catch(e){return toast("Enregistrement impossible")}
+  recChunks=[];let sec=0;const r=rec;
+  r.ondataavailable=e=>{if(e.data&&e.data.size)recChunks.push(e.data)};
+  r.onstop=()=>{
+    const type=(r.mimeType||mt||"video/webm").split(";")[0],blob=new Blob(recChunks,{type});
+    stopCam();attach(new File([blob],"video-"+Date.now()+"."+(/mp4/.test(type)?"mp4":"webm"),{type}));
+  };
+  r.start(500);$("crec").textContent="⏹ Arrêter";$("ctm").textContent="0 s / 20 s";
+  recT=setInterval(()=>{sec++;$("ctm").textContent=sec+" s / 20 s";if(sec>=20&&r.state==="recording")r.stop()},1000);
+};
+
+/* ============ TRANSFERT ============ */
+function openForward(ids){
+  fwIds=ids.filter(i=>shown.has(i));if(!fwIds.length)return toast("Rien à transférer");
+  const box=$("mfl");box.textContent="";
+  [...convs.values()].sort((a,b)=>b.lastAt-a.lastAt).forEach(c=>{
+    const ok=!!getPass(c.id),row=document.createElement("label");row.className="fr"+(ok?"":" off");
+    const cb=document.createElement("input");cb.type="checkbox";cb.value=c.id;cb.disabled=!ok;
+    const nm=document.createElement("span");nm.textContent=c.name+(ok?"":" 🔒 clé requise (ouvre la discussion)");
+    row.append(cb,nm);box.append(row);
+  });
+  say("mfm","");show("mf",true);
+}
+$("mfx").onclick=()=>show("mf",false);
+$("mfs").onclick=()=>{
+  const dests=[...$("mfl").querySelectorAll("input:checked")].map(i=>i.value);
+  if(!dests.length)return say("mfm","Choisis au moins une discussion.","e");
+  const src=cur,idx=new Map(msgs.map((m,i)=>[m.id,i])),items=fwIds.map(id=>({id,...shown.get(id)})).sort((a,b)=>idx.get(a.id)-idx.get(b.id));
+  return run("Transfert en cours…",async()=>{
+    try{
+      for(const dc of dests){
+        for(const it of items){
+          const obj={t:it.t,fw:1};let extra;
+          if(it.file){setProg("Transfert du fichier…");extra=await putFile(dc,await getFile(src,{fid:it.fid,nc:it.nc}));obj.file=it.file}
+          await postMsg(dc,obj,extra);
+        }
+        pingPush(dc);
+      }
+      show("mf",false);exitSel();toast("Transféré ✔");
+    }catch(e){console.error(e);say("mfm","Transfert impossible (clé ou réseau).","e")}
+  });
 };
 
 /* ============ CLÉ DE LA CONVERSATION (option C) ============ */
